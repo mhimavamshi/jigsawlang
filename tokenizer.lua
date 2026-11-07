@@ -8,8 +8,7 @@ tokenMethods.__index = tokenMethods
 function tokenMethods:print() 
     print("printing tokens")
     for i = 1, #self.stream do 
-        print("value: ", self.stream[i].value)
-        print("ttype: ", self.stream[i].ttype)
+        print("value: ", self.stream[i].value, "ttype: ", self.stream[i].ttype)
     end
 end
 
@@ -71,6 +70,13 @@ local function canBeIncluded(curr, nextc)
     if nextc == "}" then 
         return false 
     end
+
+    if curr == "`" then 
+        return false 
+    end
+    if nextc == "`" then 
+        return false 
+    end
     
     return true
 end
@@ -94,6 +100,9 @@ local function mintToken(str)
     end
     if str == "," then
         tokenData.ttype = "COMMA"
+    end
+    if str == "`" then
+        tokenData.ttype = "BACKTICK"
     end
     return tokenData
 end
