@@ -138,6 +138,21 @@ function tokenMethods:stripWhitespace()
     self.stream = cleanStream
 end
 
+function tokenMethods:stripComments()
+    local cleanStream = {}
+    local inComment = false
+    for i = 1, #self.stream do
+        if self.stream[i].ttype == "BACKTICK" then
+            inComment = not inComment
+        elseif not inComment then
+            table.insert(cleanStream, self.stream[i])
+        end
+    end
+    
+    self.stream = cleanStream
+end
+
+
 local function readFile(filename)
     local file, err = io.open(filename, "r")
 
