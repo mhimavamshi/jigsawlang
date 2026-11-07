@@ -40,33 +40,33 @@ I am thinking of hot reload of functions during an execution of a program also. 
 
 - Function Definition:
 ```
-# this is a comment
+` this is a comment `
 
 functionname (args) {
- expression # is evaluated and implicitly returned
+ expression ` is evaluated and implicitly returned `
 }
 ```
 - Expressions:
 ```
-# this is a comment
+` this is a comment `
 
-# simplest is runtime defined function with values
+` simplest is runtime defined function with values `
 add(4, 5)
 
-# or compose them
+` or compose them `
 print(add(4, 5))
 
-# or more expressions (assume ifelse is branch function, which is unique in evaluation order - condition is evaluated first!)
+` or more expressions (assume ifelse is branch function, which is unique in evaluation order - condition is evaluated first!) `
 print(ifelse("that's wrong...", add(1, 2), isgreater(askuser("enter number greater than 5: "), 5)))
 
-# probably a nice formatter would help...
+` probably a nice formatter would help...`
 
 ```
 - Entry point
 ```
-# this is a comment
+` this is a comment `
 
-# all programs must have main function which is evaluated first
+` all programs must have main function which is evaluated first`
 
 main() {
     print("main!)
