@@ -25,8 +25,43 @@ function parserMethods:populateBytecode()
 
 end
 
-function parserMethods:print()
+local function printNode(node, prefix, isLast)
+    prefix = prefix or ""
+    local connector = isLast and "└── " or "├── "
 
+    if node.type == "identifier" then
+        print(prefix .. connector .. "Identifier: " .. node.name)
+
+    elseif node.type == "call" then
+        print(prefix .. connector .. "Call: " .. node.name)
+
+        local nextPrefix = prefix .. (isLast and "    " or "│   ")
+        for i, arg in ipairs(node.args) do
+            printNode(arg, nextPrefix, i == #node.args)
+        end
+
+    elseif node.type == "declaration" then
+        print(prefix .. connector .. "Declaration: " .. node.name)
+
+        local nextPrefix = prefix .. (isLast and "    " or "│   ")
+        print(nextPrefix .. "├── Parameters")
+
+        for i, arg in ipairs(node.args) do
+            printNode(arg, nextPrefix .. "│   ", i == #node.args)
+        end
+
+        print(nextPrefix .. "└── Body")
+        for i, bodyNode in ipairs(node.body) do
+            printNode(bodyNode, nextPrefix .. "    ", i == #node.body)
+        end
+    end
+end
+
+function parserMethods:print()
+    print("Program")
+    for i, node in ipairs(self.tree) do
+        printNode(node, "", i == #self.tree)
+    end
 end
 
 function parserMethods:consume()
@@ -64,24 +99,24 @@ function parserMethods:expectWithError(expectedType)
         return true
     end
     printParserError("Expect cannot peek at the stream", {})
-    return false
+    os.exit(1)
 end
 
 function parserMethods:peek()
     if self.currTokenPos > #self.tokens then
-        printParserError("Peeking but at the end of stream", {})
+        -- printParserError("Peeking but at the end of stream", {})
         return nil
     end
     return self.tokens[self.currTokenPos]
 end
 
 function parser.parseDeclaration(parsed)
-    parsed:expectWithError("OPENINGBRACE")
+    parsed:expectWithError("OPENBRACE")
     parsed:consume()
-    local node = {type="body", body={}}
-    while not parsed:expect("CLOSINGBRACE") do 
+    local node = {}
+    while not parsed:expect("CLOSEBRACE") do 
         local bodyNode = parser.parseBlock(parsed)
-        table.insert(node.body, bodyNode)
+        table.insert(node, bodyNode)
     end
     parsed:consume()
     return node 
@@ -134,6 +169,19 @@ function parser.parseBlock(parsed)
     return node 
 end
 
+-- function parser.verifyTree(parsed)
+--     for i, node in ipairs(parsed.tree) do
+--         if node.type == "declaration" then 
+--             local success = parser.verifyDeclarationRecursively(node)
+--             if not success then 
+
+--         end
+--         if node.type == "call" then 
+--             local success = parser.verifyDeclarationRecursively(node)
+--         end
+--     end
+end
+
 function parser.parse(tokens)
     local parsed = {
         tree = {}, -- has to be made
@@ -144,6 +192,7 @@ function parser.parse(tokens)
     while parsed:peek() ~= nil do 
         table.insert(parsed.tree, parser.parseBlock(parsed))
     end
+    parser.verifyTree(parsed)
     return parsed
 end
 
