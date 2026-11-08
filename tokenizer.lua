@@ -176,7 +176,8 @@ function tokenizer.tokenizeFile(file)
         local tokens = {}
         setmetatable(tokens, tokenMethods)
         tokens:populate(content)
-        tokens:stripWhitespace(content) -- for now 
+        tokens:stripWhitespace() -- for now 
+        tokens:stripComments() -- for now 
         return tokens
     end
 end
