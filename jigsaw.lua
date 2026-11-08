@@ -1,6 +1,7 @@
 -- entry point for everything jigsaw
 
 local tokenizer = require("tokenizer")
+local parser = require("parser")
 
 function repl()
     print("REPL")
@@ -20,9 +21,15 @@ function run(args)
     local files = getFileNames(args)
     for i = 1, #files do
         local tokens = tokenizer.tokenizeFile(files[i])
-        if tokens ~= nil then
+        if tokens.stream ~= nil then
             tokens:print()
+            local parsed = parser.parse(tokens)
+            if parsed ~= nil then 
+                parsed:print()
+                parsed:populateBytecode()
+            end
         end
+
     end
 end
 
