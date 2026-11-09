@@ -169,17 +169,58 @@ function parser.parseBlock(parsed)
     return node 
 end
 
--- function parser.verifyTree(parsed)
---     for i, node in ipairs(parsed.tree) do
---         if node.type == "declaration" then 
---             local success = parser.verifyDeclarationRecursively(node)
---             if not success then 
+function parser.verifyDeclarationRecursively(node) 
+    for i, node in ipairs(node.args) do
+        if node.type ~= "identifier" then 
+            return false
+        end
+    end
+    for i, node in ipairs(node.body) do
+        if node.type == "declaration" then 
+            return false
+        end
+        if node.type == "call" then 
+            local success = parser.verifyCallRecursively(node)
+            if not success then 
+                return false
+            end
+        end
+    end
+    return true
+end
 
---         end
---         if node.type == "call" then 
---             local success = parser.verifyDeclarationRecursively(node)
---         end
---     end
+function parser.verifyCallRecursively(node)
+    for i, node in ipairs(node.args) do
+        if node.type == "declaration" then 
+            return false
+        end
+        if node.type == "call" then
+            local success = parser.verifyCallRecursively(node)
+            if not success then
+                return false
+            end
+        end
+    end
+    return true
+end
+
+function parser.verifyTree(parsed)
+    for i, node in ipairs(parsed.tree) do
+        if node.type == "declaration" then 
+            local success = parser.verifyDeclarationRecursively(node)
+            if not success then 
+                printParserError("Declaration is improper", {})
+                os.exit(1)
+            end
+        end
+        if node.type == "call" then 
+            local success = parser.verifyCallRecursively(node)
+            if not success then 
+                printParserError("Call is improper", {})
+                os.exit(1)
+            end
+        end
+    end
 end
 
 function parser.parse(tokens)
