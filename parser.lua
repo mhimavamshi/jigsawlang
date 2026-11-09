@@ -209,14 +209,14 @@ function parser.verifyTree(parsed)
         if node.type == "declaration" then 
             local success = parser.verifyDeclarationRecursively(node)
             if not success then 
-                printParserError("Declaration is improper", {})
+                printParserError("Declaration 'name' is improper", {name = node.name})
                 os.exit(1)
             end
         end
         if node.type == "call" then 
             local success = parser.verifyCallRecursively(node)
             if not success then 
-                printParserError("Call is improper", {})
+                printParserError("Call 'name' is improper", {name = node.name})
                 os.exit(1)
             end
         end
