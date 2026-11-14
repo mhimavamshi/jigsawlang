@@ -29,8 +29,8 @@ local function printNode(node, prefix, isLast)
     prefix = prefix or ""
     local connector = isLast and "└── " or "├── "
 
-    if node.type == "identifier" then
-        print(prefix .. connector .. "Identifier: " .. node.name)
+    if node.type == "identifier" or node.type == "integer" or node.type == "string" or node.type == "float" then
+        print(prefix .. connector .. node.type .. ": " .. node.name)
 
     elseif node.type == "call" then
         print(prefix .. connector .. "Call: " .. node.name)
@@ -223,6 +223,51 @@ function parser.verifyTree(parsed)
     end
 end
 
+function parser.classifyLiteral(literal)
+    if literal.name:match("^%d+$") ~= nil then 
+        literal.type = "integer"
+        literal.value = tonumber(literal.name)
+        return 
+    end
+    if literal.name:match("^%d+%.%d+$") ~= nil then 
+        literal.type = "float"
+        literal.value = tonumber(literal.name)
+        return 
+    end
+    if literal.name:match('^".*"$') ~= nil then
+    -- if literal.name:match("^%a+$") ~= nil then 
+        literal.type = "string"
+        return
+    end
+    -- printParserError("IDENTIFIER of type with value name cannot be classified", literal)
+    -- os.exit(1)
+end
+
+function parser.classifyLiteralsCall(node)
+    for i, argument in ipairs(node.args) do
+        if argument.type == "identifier" then 
+            parser.classifyLiteral(argument)
+        end
+        if argument.type == "call" then 
+            parser.classifyLiteralsCall(argument)
+        end
+    end
+end
+
+function parser.classifyLiterals(tree)
+    for i, node in ipairs(tree) do
+        if node.type == "declaration" then 
+            parser.classifyLiterals(node.body) 
+        end
+        if node.type == "call" then 
+            parser.classifyLiteralsCall(node)
+        end
+        if node.type == "identifier" then 
+            parser.classifyLiteral(node)
+        end
+    end
+end
+
 function parser.parse(tokens)
     local parsed = {
         tree = {}, -- has to be made
@@ -234,6 +279,7 @@ function parser.parse(tokens)
         table.insert(parsed.tree, parser.parseBlock(parsed))
     end
     parser.verifyTree(parsed)
+    parser.classifyLiterals(parsed.tree)
     return parsed
 end
 
