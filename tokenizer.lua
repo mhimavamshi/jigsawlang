@@ -30,10 +30,6 @@ local function canBeIncluded(curr, nextc)
         return false
     end
 
-    if nextc == " " then 
-        return false 
-    end
-
     -- it is interesting to note and maybe a pattern, something to simplify and do easier checks
     -- that for a char, either exclude for anything if its the next
     -- or if its the current exclude anything next
@@ -41,13 +37,16 @@ local function canBeIncluded(curr, nextc)
     -- include everything until it hits next which is something above
     -- hmmmmmm.....
 
-
     -- combine all whitespace into one token
-    if curr == " " then 
-        if nextc ~= " " then
+    if curr:match("%s") then 
+        if nextc:match("%S") then
             return false 
         end
     end 
+
+    if nextc:match("%s") then 
+        return false 
+    end
 
     -- right, lol this curr and nextc being the same thing means its a delimiter. interesting!
     if curr == "," then 
@@ -171,8 +170,8 @@ end
 function tokenizer.tokenizeFile(file)
     local content = readFile(file)
     if content ~= nil then 
-        print("file:", file)
-        print("content:", content)
+        -- print("file:", file)
+        -- print("content:", content)
         local tokens = {}
         setmetatable(tokens, tokenMethods)
         tokens:populate(content)
