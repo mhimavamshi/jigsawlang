@@ -4,7 +4,7 @@ local tokenizer = require("tokenizer")
 local parser = require("parser")
 
 function repl()
-    print("REPL")
+    print("REPL is to be done.")
 end
 
 function getFileNames(args) 
@@ -22,11 +22,14 @@ function run(args)
     for i = 1, #files do
         local tokens = tokenizer.tokenizeFile(files[i])
         if tokens.stream ~= nil then
-            tokens:print()
+            -- tokens:print()
             local parsed = parser.parse(tokens)
             if parsed ~= nil then 
                 parsed:generateMetadata()
                 parsed:print()
+                executorVM = executor.makeExecutor(parsed)
+                executorVM:execute()
+                executorVM:print()
             end
         end
 
