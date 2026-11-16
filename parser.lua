@@ -21,8 +21,21 @@ local function printParserError(message, subs)
     print("Parser Error:", errormessage)
 end
 
-function parserMethods:populateBytecode()
-
+-- gathers all top-level declarations, standalone calls, identifiers into a list, and additional fields
+function parserMethods:generateMetadata()
+    local metadata = {declarations = {}, calls = {}, identifiers = {}}
+    for i, node in ipairs(self.tree) do
+        if node.type == "declaration" then 
+            table.insert(metadata.declarations, node)
+        end
+        if node.type == "call" then 
+            table.insert(metadata.calls, node)
+        end
+        if node.type == "identifier" then 
+            table.insert(metadata.identifiers, node)
+        end
+    end    
+    self.metadata = metadata
 end
 
 local function printNode(node, prefix, isLast)
