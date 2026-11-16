@@ -25,9 +25,8 @@ function run(args)
             tokens:print()
             local parsed = parser.parse(tokens)
             if parsed ~= nil then 
-                parsed:print()
                 parsed:generateMetadata()
-                
+                parsed:print()
             end
         end
 

@@ -70,7 +70,26 @@ local function printNode(node, prefix, isLast)
     end
 end
 
+local function printMetadata(metadata)
+    print("Metadata:")
+    print("Declarations:", #metadata.declarations)
+    for _, node in ipairs(metadata.declarations) do
+        print("    " .. node.name)
+    end
+
+    print("Calls:", #metadata.calls)
+    for _, node in ipairs(metadata.calls) do
+        print("    " .. node.name)
+    end
+
+    print("Identifiers:", #metadata.identifiers)
+    for _, node in ipairs(metadata.identifiers) do
+        print("    " .. node.name)
+    end
+end
+
 function parserMethods:print()
+    printMetadata(self.metadata)
     print("Program")
     for i, node in ipairs(self.tree) do
         printNode(node, "", i == #self.tree)
